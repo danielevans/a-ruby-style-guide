@@ -1204,6 +1204,47 @@ In either case:
     major_version, minor_version, _ = version.split('.')
     ```
 
+* <a name="shadowing"></a>Avoid shadowing methods and variables. In situations
+    such as keyword arguments where shadowing is necessary or desirable over
+    the alternatives the shadow should be equivalent to the original.
+    <sup>[[link](#shadowing)]</sup>
+
+    ```ruby
+    # bad
+    class Client
+      attr_accessor :connection
+      attr_accessor :raise_errors
+
+      def initialize(connection:, raise_errors: false)
+        self.connection = Config.connection_for(connection)
+        self.raise_errors = raise_errors
+      end
+
+      def ping
+        connection = connection.open
+        connection.transmit 'ping'
+        connection.close
+      end
+    end
+
+    # good
+    class Client
+      attr_accessor :connection
+      attr_accessor :raise_errors
+
+      def initialize(service_name:, raise_errors: false)
+        self.connection = Config.connetion_for(service_name)
+        self.raise_errors = raise_errors
+      end
+
+      def ping
+        stream = connection.open
+        stream.transmit 'ping'
+        stream.close
+      end
+    end
+    ```
+
 ## Classes
 
 * <a name="avoid-class-variables"></a>Avoid the usage of class (`@@`) variables
